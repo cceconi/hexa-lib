@@ -1,0 +1,7 @@
+# composer dependencies
+/vendor
+
+# phpunit
+.phpunit.result.cache
+.phpunit.cache
+coverage
