@@ -1,0 +1,27 @@
+{
+    "name": "cceconi/hexa-lib",
+    "description": "Abstract library to create hexagonal architecture compliant application",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Apido\\HexaLib\\": "src/",
+            "Apido\\Tests\\HexaLib\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Christian CECONI"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.4",
+        "psr/log": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "ramsey/uuid": "^4.2",
+        "monolog/monolog": "^2.10"
+    }
+}

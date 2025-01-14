@@ -1,0 +1,17 @@
+services:
+  hexa-lib-cli:
+    container_name: hexa-lib-cli
+    build:
+      context: ./docker
+      args:
+        php_version: 7.4
+    image: hexa-lib/php7.4-cli
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    working_dir: /var/app/hexa-lib
+    volumes:
+      - .:/var/app/hexa-lib
+    environment:
+      - XDEBUG_MODE=coverage
+
