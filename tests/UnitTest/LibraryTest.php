@@ -2,7 +2,6 @@
 
 namespace Apido\Tests\HexaLib\UnitTest;
 
-use Apido\HexaLib\Exception\MissingComplementaryClosureException;
 use Apido\HexaLib\Message\IdentityFilter;
 use Apido\HexaLib\User\DomainUser;
 use Apido\Tests\HexaLib\Domain\Shared\Role\UserRole;

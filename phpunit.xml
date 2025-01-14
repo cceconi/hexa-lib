@@ -19,14 +19,16 @@
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage"
-              processUncoveredFiles="true" pathCoverage="true">
+              processUncoveredFiles="true"
+              pathCoverage="true">
         <include>
             <directory suffix=".php">src</directory>
         </include>
         <exclude>
             <directory>vendor</directory>
             <directory>tests</directory>
-        </exclude><report>
+        </exclude>
+        <report>
             <html outputDirectory="coverage"/>
         </report>
     </coverage>
