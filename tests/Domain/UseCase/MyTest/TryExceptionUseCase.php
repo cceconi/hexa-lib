@@ -20,6 +20,10 @@ class TryExceptionUseCase extends AbstractUseCase implements UseCaseInterface, T
     
     public function apply(TryExceptionEvent $event): void
     {
+        $this->onError("onError", function (TryExceptionEvent $event) {
+            $this->eventHandler->log($event, "😱 Error");
+        }, true);
+
         $this->handle($event, function (TryExceptionEvent $event): TryExceptionResult {
             $event->hasPermission(function () {
                 return true;

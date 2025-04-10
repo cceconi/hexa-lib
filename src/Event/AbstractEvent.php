@@ -195,4 +195,14 @@ abstract class AbstractEvent
     {
         return $this->uuidv4;
     }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function getClassName(): string
+    {
+        return $this->eventClass->getName();
+    }
 }
