@@ -25,6 +25,10 @@ class TryMyUseCase extends AbstractUseCase implements UseCaseInterface, TryMyUse
     
     public function apply(TryMyUseCaseEvent $event): void
     {
+        $this->onSuccess("onSuccess", function (TryMyUseCaseEvent $event) {
+            $this->eventHandler->log($event, "😄 Success");
+        }, true);
+
         $this->handle($event, function (TryMyUseCaseEvent $event): TryMyUseCaseResult {
             $event->hasPermission();
             $this->eventHandler->debug($event, "😅 Debug message", true);
