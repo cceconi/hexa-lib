@@ -28,4 +28,6 @@ interface EventInterface
     public function getAggregateId(): string;
     public function getLocalAggregateId(): string;
     public function getOpsWriter(): ?OperationWriterInterface;
+    public function getStatus(): string;
+    public function getClassName(): string;
 }
