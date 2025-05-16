@@ -18,7 +18,7 @@ use Apido\HexaLib\User\DomainUserInterface;
 use Apido\HexaLib\Utils\Uuidv4Interface;
 use ReflectionClass;
 
-abstract class AbstractEvent
+abstract class AbstractEvent implements EventInterface
 {
     public const STATUS_SUCCESS = 'success';
     public const STATUS_DOMAIN_ERROR = 'error:domain';
@@ -26,8 +26,8 @@ abstract class AbstractEvent
     public const STATUS_TODO = 'todo';
 
     private Uuidv4Interface $uuidv4;
-    private string $aggregateId;
-    private string $localAggregateId;
+    private string $eventId;
+    private string $localEventId;
     private DateTime $createdAt;
     private ReflectionClass $eventClass;
     protected DomainUser $user;
@@ -39,12 +39,12 @@ abstract class AbstractEvent
     protected ?PresenterInterface $presenter;
     protected int $bestPermission = AbstractRole::FORBIDDEN;
 
-    public function __construct(Uuidv4Interface $uuidv4, DomainUser $user, PayloadInterface $payload, ?OperationWriterInterface $opsWriter = null, ?string $aggregateRootId = null)
+    public function __construct(Uuidv4Interface $uuidv4, DomainUser $user, PayloadInterface $payload, ?OperationWriterInterface $opsWriter = null, ?string $eventRootId = null)
     {
         $this->uuidv4 = $uuidv4;
-        $this->aggregateId = $aggregateRootId ?? $uuidv4->generate();
-        $this->localAggregateId = $uuidv4->generate();
-        $this->isMaster = !isset($aggregateRootId);
+        $this->eventId = $eventRootId ?? $uuidv4->generate();
+        $this->localEventId = $uuidv4->generate();
+        $this->isMaster = !isset($eventRootId);
         $this->createdAt = new DateTime();
         $this->eventClass = new ReflectionClass($this);
         $this->user = $user;
@@ -80,7 +80,7 @@ abstract class AbstractEvent
      */
     public static function fromMainEvent(EventInterface $event, PayloadInterface $payload): self
     {
-        return new static($event->getUuidV4(), $event->getUser(), $payload, $event->getOpsWriter(), $event->getAggregateId());
+        return new static($event->getUuidV4(), $event->getUser(), $payload, $event->getOpsWriter(), $event->getEventId());
     }
 
     public function updateStatus(string $status): void
@@ -97,18 +97,18 @@ abstract class AbstractEvent
 
     public function __toString(): string
     {
-        return $this->aggregateId . ' - ' . $this->eventClass->getShortName() . ' - ' . $this->user . ' - ' . $this->status;
+        return $this->eventId . ' - ' . $this->eventClass->getShortName() . ' - ' . $this->user . ' - ' . $this->status;
     }
 
     public function getMessage(string $message): string
     {
-        return $this->aggregateId . ' - ' . $this->eventClass->getShortName() . ' - ' . $message;
+        return $this->eventId . ' - ' . $this->eventClass->getShortName() . ' - ' . $message;
     }
 
     public function toArray(): array
     {
         return [
-            'aggregateId' => $this->aggregateId,
+            'eventId' => $this->eventId,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'eventName' => $this->eventClass->getShortName(),
             'user' => $this->user->getFullname(),
@@ -147,14 +147,26 @@ abstract class AbstractEvent
         }
     }
 
-    public function getAggregateId(): string
+    public function getEventId(): string
     {
-        return $this->aggregateId;
+        return $this->eventId;
     }
 
+    public function getLocalEventId(): string
+    {
+        return $this->localEventId;
+    }
+
+    /** @deprecated 1.2.0 Use getEventId instead, will be removed in version 1.3.0 or more */
+    public function getAggregateId(): string
+    {
+        return $this->getEventId();
+    }
+
+    /** @deprecated 1.2.0 Use getLocalEventId instead, will be removed in version 1.3.0 or more */
     public function getLocalAggregateId(): string
     {
-        return $this->localAggregateId;
+        return $this->getLocalEventId();
     }
 
     public function isMaster(): bool
@@ -170,7 +182,7 @@ abstract class AbstractEvent
     public function executeOperations(): void
     {
         if ($this->opsWriter) {
-            $this->opsWriter->execute($this->aggregateId);
+            $this->opsWriter->execute($this->eventId);
         }
     }
 
