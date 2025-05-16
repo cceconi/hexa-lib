@@ -31,7 +31,7 @@ final class EventHandler
             $this->time = microtime(true);
             $this->times = [];
         } else {
-            $this->times[$event->getLocalAggregateId()] = microtime(true);
+            $this->times[$event->getLocalEventId()] = microtime(true);
         }   
     }
 
@@ -69,7 +69,7 @@ final class EventHandler
             'exectime' => number_format((microtime(true) - $this->time) * 1000, 3) . 'ms',
         ] : [
             'exectime from master' => number_format((microtime(true) - $this->time) * 1000, 3) . 'ms',
-            'exectime local' => number_format((microtime(true) - $this->times[$event->getLocalAggregateId()]) * 1000, 3) . 'ms'
+            'exectime local' => number_format((microtime(true) - $this->times[$event->getLocalEventId()]) * 1000, 3) . 'ms'
         ];
     }
 }

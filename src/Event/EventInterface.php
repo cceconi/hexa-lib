@@ -25,8 +25,8 @@ interface EventInterface
     public function setPresenter(PresenterInterface $presenter): void;
     public function presentData(): void;
     public function isMaster(): bool;
-    public function getAggregateId(): string;
-    public function getLocalAggregateId(): string;
+    public function getEventId(): string;
+    public function getLocalEventId(): string;
     public function getOpsWriter(): ?OperationWriterInterface;
     public function getStatus(): string;
     public function getClassName(): string;

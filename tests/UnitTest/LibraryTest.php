@@ -43,7 +43,7 @@ class LibraryTest extends TestCase
     {
         $event = TryMyUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryMyUseCasePayload());
         $eventData = $event->toArray();
-        $this->assertArrayHasKey("aggregateId", $eventData);
+        $this->assertArrayHasKey("eventId", $eventData);
         $this->assertArrayHasKey("eventName", $eventData);
         $this->assertEquals("TryMyUseCaseEvent", $eventData["eventName"]);
     }
@@ -52,7 +52,7 @@ class LibraryTest extends TestCase
     {
         $event = TryMyUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [], "User Test"), new TryMyUseCasePayload());
         $eventData = $event->toArray();
-        $this->assertArrayHasKey("aggregateId", $eventData);
+        $this->assertArrayHasKey("eventId", $eventData);
         $this->assertArrayHasKey("eventName", $eventData);
         $this->assertEquals("TryMyUseCaseEvent", $eventData["eventName"]);
     }
@@ -63,7 +63,7 @@ class LibraryTest extends TestCase
 
         $event = TryMyUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new IdentityFilter()], "User Test"), new TryMyUseCasePayload());
         $eventData = $event->toArray();
-        $this->assertArrayHasKey("aggregateId", $eventData);
+        $this->assertArrayHasKey("eventId", $eventData);
         $this->assertArrayHasKey("eventName", $eventData);
         $this->assertEquals("TryMyUseCaseEvent", $eventData["eventName"]);
     }
