@@ -4,13 +4,11 @@ namespace Apido\Tests\HexaLib\UnitTest;
 
 use Apido\HexaLib\Exception\PermissionException;
 use Apido\HexaLib\Exception\MissingComplementaryClosureException;
-use Apido\HexaLib\Role\GuestRole;
 use Apido\HexaLib\User\DomainUser;
 use Apido\Tests\HexaLib\Domain\Shared\Role\AdminRole;
 use Apido\Tests\HexaLib\Domain\Shared\Role\MachineRole;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryMyUseCaseEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message\TryMyUseCasePayload;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryMyUseCase;
 use Apido\Tests\HexaLib\Infrastructure\Utils\Uuidv4;
 use Apido\Tests\HexaLib\Domain\Shared\Role\UserRole;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\DTO\MyModel;
@@ -20,10 +18,11 @@ use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryMyComplexUseCaseEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryPermissionUseCaseEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message\TryExceptionPayload;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message\TryMyComplexUseCasePayload;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryExceptionUseCase;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryForbiddenUseCase;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryMyComplexUseCase;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryPermissionUseCase;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryExceptionQuery;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryForbiddenQuery;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryMyCommand;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryMyComplexCommand;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\TryPermissionQuery;
 use Apido\Tests\HexaLib\Infrastructure\Presenter\ComplexUseCasePresenter;
 use Apido\Tests\HexaLib\Infrastructure\Repository\StatementWriter;
 use Apido\Tests\HexaLib\Infrastructure\Service\MyService;
@@ -59,7 +58,7 @@ class UseCaseTest extends TestCase
     
     public function testBasicUseCase(): void
     {
-        $useCase = new TryMyUseCase($this->myService, $this->logger);
+        $useCase = new TryMyCommand($this->myService, $this->logger);
         $event = TryMyUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole(), new AdminRole()], "Mixed Test"), new TryMyUseCasePayload(), new StatementWriter());
         $useCase->apply($event);
         $data = $event->getResult()->getData();
@@ -71,7 +70,7 @@ class UseCaseTest extends TestCase
     
     public function testInfrastructureExceptionUseCase(): void
     {
-        $useCase = new TryMyUseCase($this->myService, $this->logger);
+        $useCase = new TryMyCommand($this->myService, $this->logger);
         $event = TryMyUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryMyUseCasePayload(true), new StatementWriter());
         
         $this->expectException(\Exception::class);
@@ -82,8 +81,10 @@ class UseCaseTest extends TestCase
 
     public function testExceptionUseCaseWithPermissionException(): void
     {
-        $useCase = new TryExceptionUseCase($this->logger);
-        $event = TryExceptionEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryExceptionPayload());
+        $useCase = new TryExceptionQuery($this->logger, $this->myService);
+        $event = TryExceptionEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryExceptionPayload(
+            $this->uuidv4->generate()
+        ));
         
         $this->expectException(PermissionException::class);
 
@@ -92,7 +93,7 @@ class UseCaseTest extends TestCase
 
     public function testForbiddenUseCase(): void
     {
-        $useCase = new TryForbiddenUseCase($this->myService, $this->logger);
+        $useCase = new TryForbiddenQuery($this->myService, $this->logger);
         $event = TryForbiddenEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryMyUseCasePayload());
         
         $this->expectException(PermissionException::class);
@@ -102,7 +103,7 @@ class UseCaseTest extends TestCase
 
     public function testBasicUseCaseWithComplementaryPermissionException(): void
     {
-        $useCase = new TryMyUseCase($this->myService, $this->logger);
+        $useCase = new TryMyCommand($this->myService, $this->logger);
         $event = TryMyUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new MachineRole()], "Machine Test"), new TryMyUseCasePayload());
         
         $this->expectException(MissingComplementaryClosureException::class);
@@ -112,7 +113,7 @@ class UseCaseTest extends TestCase
     
     public function testPermissionUseCase(): void
     {
-        $useCase = new TryPermissionUseCase($this->myService, $this->logger);
+        $useCase = new TryPermissionQuery($this->myService, $this->logger);
         $event = TryPermissionUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryMyUseCasePayload());
         $useCase->apply($event);
         $data = $event->getResult()->getData();
@@ -124,7 +125,7 @@ class UseCaseTest extends TestCase
     
     public function testPermissionUseCaseWithPermissionException(): void
     {
-        $useCase = new TryPermissionUseCase($this->myService, $this->logger);
+        $useCase = new TryPermissionQuery($this->myService, $this->logger);
         $event = TryPermissionUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new MachineRole()], "Machine Test"), new TryMyUseCasePayload());
         
         $this->expectException(PermissionException::class);
@@ -133,7 +134,7 @@ class UseCaseTest extends TestCase
     
     public function testComplexUseCase(): void
     {
-        $useCase = new TryMyComplexUseCase(new TryMyUseCase($this->myService, $this->logger), $this->logger);
+        $useCase = new TryMyComplexCommand(new TryMyCommand($this->myService, $this->logger), $this->logger);
         $event = TryMyComplexUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new AdminRole()], "Admin Test"), new TryMyComplexUseCasePayload(new TryMyUseCasePayload()));
         $useCase->apply($event);
         $data = $event->getResult()->getData();
@@ -149,7 +150,7 @@ class UseCaseTest extends TestCase
     
     public function testComplexAdminDataUseCase(): void
     {
-        $useCase = new TryMyComplexUseCase(new TryMyUseCase($this->myService, $this->logger), $this->logger);
+        $useCase = new TryMyComplexCommand(new TryMyCommand($this->myService, $this->logger), $this->logger);
         $event = TryMyComplexUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new UserRole()], "User Test"), new TryMyComplexUseCasePayload(new TryMyUseCasePayload()));
         $useCase->apply($event);
         $result = json_decode(json_encode($event->getResult()), true);
@@ -159,7 +160,7 @@ class UseCaseTest extends TestCase
     
     public function testComplexPresenterDataUseCase(): void
     {
-        $useCase = new TryMyComplexUseCase(new TryMyUseCase($this->myService, $this->logger), $this->logger);
+        $useCase = new TryMyComplexCommand(new TryMyCommand($this->myService, $this->logger), $this->logger);
         $event = TryMyComplexUseCaseEvent::build($this->uuidv4, new DomainUser($this->uuidv4->generate(), [new AdminRole()], "Admin Test"), new TryMyComplexUseCasePayload(new TryMyUseCasePayload()));
         $event->setPresenter(new ComplexUseCasePresenter());
         $useCase->apply($event);

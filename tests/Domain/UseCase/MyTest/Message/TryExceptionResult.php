@@ -3,13 +3,13 @@
 namespace Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message;
 
 use Apido\HexaLib\Message\AbstractResult;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\DTO\MyModel;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Model\BusinessEntity;
 
 class TryExceptionResult extends AbstractResult
 {
-    private MyModel $data;
+    private BusinessEntity $data;
     
-    public function __construct(MyModel $data)
+    public function __construct(BusinessEntity $data)
     {
         $this->data = $data;
     }
@@ -24,7 +24,7 @@ class TryExceptionResult extends AbstractResult
         return $this->data->toArray();
     }
 
-    public function getData(): MyModel
+    public function getData(): BusinessEntity
     {
         return $this->data;
     }

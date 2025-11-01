@@ -4,18 +4,24 @@ namespace Apido\Tests\HexaLib\Domain\UseCase\MyTest;
 
 use Apido\HexaLib\UseCase\AbstractUseCase;
 use Apido\HexaLib\UseCase\UseCaseInterface;
-use Apido\Tests\HexaLib\Domain\Api\TryExceptionUseCaseInterface;
-use Apido\Tests\HexaLib\Domain\UseCase\MyTest\DTO\MyModel;
+use Apido\Tests\HexaLib\Domain\Api\TryExceptionQueryInterface;
+use Apido\Tests\HexaLib\Domain\Spi\MyServiceInterface;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryExceptionEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message\TryExceptionResult;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Model\BusinessEntity;
+use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Model\Status;
 use Psr\Log\LoggerInterface;
 
-class TryExceptionUseCase extends AbstractUseCase implements UseCaseInterface, TryExceptionUseCaseInterface
+class TryExceptionQuery extends AbstractUseCase implements UseCaseInterface, TryExceptionQueryInterface
 {
+    private MyServiceInterface $myService;
+    
     public function __construct(
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MyServiceInterface $myService
     ) {
         parent::__construct($logger);
+        $this->myService = $myService;
     }
     
     public function apply(TryExceptionEvent $event): void
@@ -28,7 +34,13 @@ class TryExceptionUseCase extends AbstractUseCase implements UseCaseInterface, T
             $event->hasPermission(function () {
                 return true;
             });
-            return new TryExceptionResult(new MyModel("⚠️ Exception thrown!", "🔒 For Admin only", "no value"));
+            $businessEntity = new BusinessEntity(
+                $event->getPayload()->getUid(),
+                Status::ERROR,
+                "🔒 For Admin only",
+                $this->myService->doSomething()
+            );
+            return new TryExceptionResult($businessEntity);
         });
     }
 }

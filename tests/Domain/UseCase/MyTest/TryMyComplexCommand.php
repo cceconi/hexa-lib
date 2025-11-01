@@ -4,19 +4,20 @@ namespace Apido\Tests\HexaLib\Domain\UseCase\MyTest;
 
 use Apido\HexaLib\UseCase\AbstractUseCase;
 use Apido\HexaLib\UseCase\UseCaseInterface;
-use Apido\Tests\HexaLib\Domain\Api\TryMyComplexUseCaseInterface;
+use Apido\Tests\HexaLib\Domain\Api\TryMyCommandInterface;
+use Apido\Tests\HexaLib\Domain\Api\TryMyComplexCommandInterface;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\DTO\MyModel;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryMyComplexUseCaseEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryMyUseCaseEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message\TryMyComplexUseCaseResult;
 use Psr\Log\LoggerInterface;
 
-class TryMyComplexUseCase extends AbstractUseCase implements UseCaseInterface, TryMyComplexUseCaseInterface
+class TryMyComplexCommand extends AbstractUseCase implements UseCaseInterface, TryMyComplexCommandInterface
 {
-    private TryMyUseCase $tryMyUseCase;
+    private TryMyCommandInterface $tryMyUseCase;
 
     public function __construct(
-        TryMyUseCase $tryMyUseCase,
+        TryMyCommandInterface $tryMyUseCase,
         LoggerInterface $logger
     ) {
         parent::__construct($logger);

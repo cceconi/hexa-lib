@@ -4,14 +4,14 @@ namespace Apido\Tests\HexaLib\Domain\UseCase\MyTest;
 
 use Apido\HexaLib\UseCase\AbstractUseCase;
 use Apido\HexaLib\UseCase\UseCaseInterface;
-use Apido\Tests\HexaLib\Domain\Api\TryForbiddenUseCaseInterface;
+use Apido\Tests\HexaLib\Domain\Api\TryForbiddenQueryInterface;
 use Apido\Tests\HexaLib\Domain\Spi\MyServiceInterface;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\DTO\MyModel;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Event\TryForbiddenEvent;
 use Apido\Tests\HexaLib\Domain\UseCase\MyTest\Message\TryMyUseCaseResult;
 use Psr\Log\LoggerInterface;
 
-class TryForbiddenUseCase extends AbstractUseCase implements UseCaseInterface, TryForbiddenUseCaseInterface
+class TryForbiddenQuery extends AbstractUseCase implements UseCaseInterface, TryForbiddenQueryInterface
 {
     private MyServiceInterface $myService;
 
